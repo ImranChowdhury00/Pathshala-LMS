@@ -20,16 +20,10 @@ class IsAdminOrOwner(permissions.BasePermission):
     
         return obj == request.user
 
-# class IsAdminOrReadOnly(permissions.BasePermission):
-#     """
-#     Admin users can perform any action (full CRUD).
-#     Other authenticated users can only perform read-only actions (GET, HEAD, OPTIONS).
-#     """
-#     def has_permission(self, request, view):
-#         # Allow GET, HEAD, OPTIONS requests for anyone authenticated
-#         if request.method in permissions.SAFE_METHODS and request.user.is_authenticated:
-#             return True
+class IsAdminOrReadOnly(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if request.method in permissions.SAFE_METHODS:
+            return True
         
-#         # Allow all methods only for Admin
-#         return bool(request.user and request.user.role == 'ADMIN')
+        return bool(request.user and request.user.is_authenticated and request.user.role == 'ADMIN')
 
