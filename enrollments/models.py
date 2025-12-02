@@ -4,16 +4,22 @@ from courses.models import Course, TimeStampedModel
 from users.models import User
 
 class Enrollment(TimeStampedModel):
+    STATUS_CHOICES = [
+        ('PENDING', 'Pending'),
+        ('ACTIVE', 'Active'),
+        ('CANCELLED', 'Cancelled'),
+    ]
     student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='enrollments', limit_choices_to={'role': 'STUDENT'})
     course = models.ForeignKey(Course,on_delete=models.CASCADE,related_name='enrollments')
     price = models.FloatField()
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='PENDING')
 
     class Meta:
         unique_together = ('student', 'course') 
         verbose_name_plural = "Enrollments"
 
     def __str__(self):
-        return f"{self.student.username} enrolled in {self.course.title}"
+        return f"Student : {self.student.username} enrolled in Course :{self.course.title}"
     
     
 class Transaction(TimeStampedModel):
