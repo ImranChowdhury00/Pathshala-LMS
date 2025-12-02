@@ -1,3 +1,5 @@
 from django.contrib import admin
+from .models import LessonCompletion, CourseProgress
 
-# Register your models here.
+admin.site.register(LessonCompletion)
+admin.site.register(CourseProgress)
