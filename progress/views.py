@@ -4,7 +4,7 @@ from .models import LessonCompletion, CourseProgress
 from .serializers import LessonCompletionSerializer, CourseProgressSerializer
 from .permissions import IsAdminOrOwner, IsOwnerOrReadOnly
 from courses.models import Lesson
-
+from rest_framework.exceptions import PermissionDenied
 
 class LessonCompletionViewSet(viewsets.ModelViewSet):
     queryset = LessonCompletion.objects.all()
@@ -25,7 +25,11 @@ class LessonCompletionViewSet(viewsets.ModelViewSet):
 
 
     def perform_create(self, serializer):
-        student = self.request.user
+        student = serializer.validated_data.get('student', self.request.user)
+
+        if student != self.request.user and not (self.request.user.is_superuser or self.request.user.role == "ADMIN"):
+            raise PermissionDenied("You cannot assign progress to other students.")
+        
         lesson = serializer.validated_data["lesson"]
         is_completed = serializer.validated_data.get("is_completed", True)
 
