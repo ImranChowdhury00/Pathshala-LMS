@@ -15,18 +15,16 @@ class CourseSerializer(serializers.Serializer):
 class TransactionSerializer(serializers.ModelSerializer):
     student_detail = UserDetailSerializer(source='student', read_only=True)
     course_detail = CourseSerializer(source='course', read_only=True)
-    enrollment = serializers.StringRelatedField()
     
     class Meta:
         model = Transaction
-        fields = ['id', 'enrollment', 'amount', 'status', 'transaction_id', 'student_detail', 'course_detail', 'created_at']
-        read_only_fields = ('student', 'course', 'amount', 'transaction_id', 'status')
+        fields = ['id', 'enrollment', 'amount', 'status', 'student','course','transaction_id', 'student_detail', 'course_detail', 'created_at']
 
 
 class EnrollmentSerializer(serializers.ModelSerializer):
-    student_details = UserDetailSerializer(source='student', read_only = True)
-    course_details = CourseSerializer(source ='course', read_only = True)
+    # student_details = UserDetailSerializer(source='student', read_only = True)
+    # course_details = CourseSerializer(source ='course')
     class Meta:
         model = Enrollment
-        fields= ['id', 'price', 'status', 'student_details', 'course_details', 'created_at']
-        read_only_fields = ('student', 'price')
+        fields= '__all__'
+        

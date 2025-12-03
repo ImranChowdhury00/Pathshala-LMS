@@ -53,18 +53,28 @@ class TransactionViewSet(viewsets.ModelViewSet):
         
         return [IsAuthenticated(), IsAdminOrEnrolled()]
     
+    def update_enrollment_status(self, transaction):
+        enrollment = transaction.enrollment
+        if not enrollment:
+            return
+        if transaction.status == 'SUCCESS':
+            enrollment.status = 'ACTIVE'
+        elif transaction.status in ['FAILED', 'REFUNDED']:
+            enrollment.status = 'CANCELLED'
+        enrollment.save()   
+    
     def perform_create(self, serializer):
         user = self.request.user
-        serializer.save(student=user, status='PENDING')
+        status = serializer.validated_data.get('status', 'PENDING')
+
+        if user.role == 'ADMIN':
+            transaction = serializer.save(status=status)
+        else:
+            transaction = serializer.save(student=user,status=status)
+
+        self.update_enrollment_status(transaction)
 
     def perform_update(self, serializer):
     
         transaction = serializer.save()
-
-        enrollment = transaction.enrollment
-        if enrollment:
-            if transaction.status == 'SUCCESS':
-                enrollment.status = 'ACTIVE'
-            elif transaction.status in ['FAILED', 'REFUNDED']:
-                enrollment.status = 'CANCELLED'
-            enrollment.save()
+        self.update_enrollment_status(transaction)

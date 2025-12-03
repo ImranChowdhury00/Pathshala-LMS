@@ -2,6 +2,7 @@ from django.db import models
 from django.core.validators import MinValueValidator
 from courses.models import Course, TimeStampedModel
 from users.models import User
+import uuid
 
 class Enrollment(TimeStampedModel):
     STATUS_CHOICES = [
@@ -36,6 +37,11 @@ class Transaction(TimeStampedModel):
     amount = models.DecimalField(max_digits=6, decimal_places=2, validators=[MinValueValidator(0.01)])
     status = models.CharField(max_length=10, choices=TransactionStatus.choices, default=TransactionStatus.PENDING)
     transaction_id = models.CharField(max_length=100, unique=True, null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        if not self.transaction_id:
+            self.transaction_id = uuid.uuid4().hex.upper()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.status} transaction for {self.course.title} by {self.student.username}"
