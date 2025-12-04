@@ -8,5 +8,5 @@ urlpatterns = [
     path('course/', include('courses.urls')),
     path('enrollment/', include('enrollments.urls')),
     path('progress/', include('progress.urls')),
-    # path('interaction/', include('interactions.urls'))
+    path('interactions/', include('interactions.urls'))
 ]
